@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<!-- saved from url=(0069)file:///C:/Users/yairg/Downloads/Israel_Hayom_Char_Counter%20(1).html -->
+<html lang="he" dir="rtl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>היום סופרים תווים</title>
+  <link href="./index_files/css2" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #fff;
+      font-family: 'Heebo', sans-serif;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 28px 20px 48px;
+    }
+
+    .section-title {
+      color: #D50000;
+      font-size: 16px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .outer {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .tables-col {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .box {
+      background: #fff;
+      border: 1.5px solid #ddd;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .field-wrap { display: flex; flex-direction: column; gap: 4px; }
+
+    .field-top { display: flex; align-items: center; justify-content: space-between; }
+
+    .field-name { font-size: 13px; font-weight: 700; color: #444; }
+
+    .counter {
+      font-size: 12px;
+      font-weight: 700;
+      direction: ltr;
+      color: #4ecf8e;
+      transition: color 0.2s;
+    }
+
+    textarea {
+      width: 100%;
+      background: #f7f7f7;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      color: #1a1a1a;
+      font-family: 'Heebo', sans-serif;
+      font-size: 14px;
+      line-height: 1.55;
+      padding: 8px 12px;
+      outline: none;
+      direction: rtl;
+      resize: none;
+      overflow: hidden;
+      transition: border-color 0.2s, background 0.15s;
+    }
+
+    textarea:focus  { border-color: #D50000; background: #fff; }
+    textarea.warn   { border-color: #f0a500 !important; }
+    textarea.danger { border-color: #e00    !important; }
+
+    .ta-wrap { position: relative; }
+
+    .ta-highlight {
+      position: absolute;
+      inset: 0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-family: 'Heebo', sans-serif;
+      font-size: 14px;
+      line-height: 1.55;
+      direction: rtl;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow: hidden;
+      pointer-events: none;
+      color: #1a1a1a;
+    }
+
+    .ta-highlight .over {
+      color: #e00;
+      background: rgba(220,0,0,0.08);
+      border-radius: 2px;
+    }
+
+    .ta-wrap textarea {
+      position: relative;
+      background: transparent;
+      caret-color: #1a1a1a;
+      color: #1a1a1a;
+    }
+
+    .ta-wrap textarea.has-overflow {
+      color: transparent;
+      caret-color: #1a1a1a;
+    }
+
+    .prog { height: 3px; background: #eee; border-radius: 99px; overflow: hidden; }
+    .prog-fill {
+      height: 100%; border-radius: 99px;
+      background: #4ecf8e;
+      transition: width 0.2s, background 0.3s;
+      width: 0%;
+    }
+
+    hr { border: none; border-top: 1px solid #eee; }
+
+    .actions { display: flex; gap: 10px; }
+
+    .copy-btn, .clear-btn {
+      flex: 1;
+      padding: 9px 0;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Heebo', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.15s;
+    }
+
+    .copy-btn { background: #D50000; color: #fff; }
+    .copy-btn:hover  { background: #B00000; transform: translateY(-1px); }
+    .copy-btn.copied { background: #2a9c5f; }
+
+    .clear-btn { background: #f2f2f2; color: #555; flex: 0 0 76px; }
+    .clear-btn:hover { background: #e0e0e0; transform: translateY(-1px); }
+
+    .bottom-grid { display: flex; gap: 20px; align-items: stretch; }
+
+    .col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .col .box { flex: 1; }
+
+    /* ---- Mobile Responsive ---- */
+    @media (max-width: 768px) {
+      body { padding: 16px 12px 40px; }
+
+      .outer { flex-direction: column; gap: 16px; }
+
+      .tables-col { gap: 16px; }
+
+      .bottom-grid { flex-direction: column; gap: 16px; }
+
+      .col { width: 100%; }
+
+      .copy-btn, .clear-btn {
+        font-size: 13px;
+        padding: 10px 6px;
+      }
+
+      .box { padding: 14px 12px; }
+
+      textarea { font-size: 15px; }
+
+      .field-name { font-size: 12px; }
+    }
+  </style>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23D50000' viewBox='0 0 16 16'&gt;&lt;path d='M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z'/&gt;&lt;path fill-rule='evenodd' d='M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z'/&gt;&lt;/svg&gt;">
+</head>
+<body>
+
+<img src="./index_files/Desktop-logotype-grad.png" alt="ישראל היום" referrerpolicy="no-referrer" onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='block';" style="display:block;margin:0 auto;max-width:200px;width:100%;padding:8px 0;">
+<div id="logo-fallback" style="display:none;text-align:center;font-size:28px;font-weight:800;color:#D50000;padding:8px 0;">ישראל היום</div>
+
+<div style="border-bottom:3px solid #D50000;margin:12px 0 20px;"></div>
+
+<div class="outer">
+
+  <div class="tables-col">
+
+    <div>
+      <div class="section-title">פוש</div>
+      <div class="box">
+        <div class="field-wrap">
+          <div class="field-top">
+            <span class="field-name">פוש — עד 70 תווים</span>
+            <span class="counter" id="cnt-push">0/70</span>
+          </div>
+          <div class="ta-wrap"><div class="ta-highlight" id="hl-field-push"></div><textarea id="field-push" rows="3" placeholder="הקלד טקסט פוש..."></textarea></div>
+          <div class="prog"><div class="prog-fill" id="bar-push"></div></div>
+        </div>
+        <hr>
+        <div class="actions">
+          <button class="copy-btn" id="btn-push" onclick="copyField('field-push','btn-push')">העתק</button>
+          <button class="clear-btn" onclick="clearField('field-push','cnt-push','bar-push',70)">מחק</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-grid">
+
+      <div class="col">
+        <div class="section-title">כותרת ראשית</div>
+        <div class="box">
+          <div class="field-wrap">
+            <div class="field-top">
+              <span class="field-name">כותרת — עד 50 תווים</span>
+              <span class="counter" id="cnt-title">0/50</span>
+            </div>
+            <div class="ta-wrap"><div class="ta-highlight" id="hl-field-title"></div><textarea id="field-title" rows="2" placeholder="הקלד כותרת..."></textarea></div>
+            <div class="prog"><div class="prog-fill" id="bar-title"></div></div>
+          </div>
+          <hr>
+          <div class="actions">
+            <button class="copy-btn" id="btn-main" onclick="copyField('field-title','btn-main')">העתק</button>
+            <button class="clear-btn" onclick="clearField('field-title','cnt-title','bar-title',50)">מחק</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="section-title">חמישייה</div>
+        <div class="box">
+          <div class="field-wrap">
+            <div class="field-top">
+              <span class="field-name">כותרת — עד 42 תווים</span>
+              <span class="counter" id="cnt-hp-title">0/42</span>
+            </div>
+            <div class="ta-wrap"><div class="ta-highlight" id="hl-field-hp-title"></div><textarea id="field-hp-title" rows="2" placeholder="הקלד כותרת..."></textarea></div>
+            <div class="prog"><div class="prog-fill" id="bar-hp-title"></div></div>
+          </div>
+          <hr>
+          <div class="actions">
+            <button class="copy-btn" id="btn-hp" onclick="copyField('field-hp-title','btn-hp')">העתק</button>
+            <button class="clear-btn" onclick="clearField('field-hp-title','cnt-hp-title','bar-hp-title',42)">מחק</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="section-title">כותרות + חדשות</div>
+        <div class="box">
+          <div class="field-wrap">
+            <div class="field-top">
+              <span class="field-name">כותרת — עד 70 תווים</span>
+              <span class="counter" id="cnt-mag-title">0/70</span>
+            </div>
+            <div class="ta-wrap"><div class="ta-highlight" id="hl-field-mag-title"></div><textarea id="field-mag-title" rows="3" placeholder="הקלד כותרת..."></textarea></div>
+            <div class="prog"><div class="prog-fill" id="bar-mag-title"></div></div>
+          </div>
+          <hr>
+          <div class="actions">
+            <button class="copy-btn" id="btn-mag" onclick="copyField('field-mag-title','btn-mag')">העתק</button>
+            <button class="clear-btn" onclick="clearField('field-mag-title','cnt-mag-title','bar-mag-title',70)">מחק</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  }
+
+  const ALL = [
+    { taId: 'field-push',      cntId: 'cnt-push',      barId: 'bar-push',      max: 70 },
+    { taId: 'field-title',     cntId: 'cnt-title',     barId: 'bar-title',     max: 50 },
+    { taId: 'field-hp-title',  cntId: 'cnt-hp-title',  barId: 'bar-hp-title',  max: 42 },
+    { taId: 'field-mag-title', cntId: 'cnt-mag-title', barId: 'bar-mag-title', max: 70 },
+  ];
+
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function updateHighlight(ta, hl, max) {
+    const val = ta.value;
+    if (val.length > max) {
+      const ok  = escapeHtml(val.slice(0, max));
+      const bad = escapeHtml(val.slice(max));
+      hl.innerHTML = ok + '<span class="over">' + bad + '</span>';
+      ta.classList.add('has-overflow');
+    } else {
+      hl.innerHTML = '';
+      ta.classList.remove('has-overflow');
+    }
+    hl.scrollTop = ta.scrollTop;
+  }
+
+  ALL.forEach(f => {
+    const ta  = document.getElementById(f.taId);
+    const cnt = document.getElementById(f.cntId);
+    const bar = document.getElementById(f.barId);
+    const hl  = document.getElementById('hl-' + f.taId);
+
+    ta.addEventListener('input', () => {
+      autoResize(ta);
+      const len = ta.value.length;
+      const pct = len / f.max * 100;
+      cnt.textContent = len + '/' + f.max;
+      let color = '#4ecf8e';
+      if (pct >= 100) color = '#e00';
+      else if (pct >= 80) color = '#f0a500';
+      bar.style.width = Math.min(pct, 100) + '%';
+      bar.style.background = color;
+      cnt.style.color = color;
+      ta.classList.remove('warn','danger');
+      if (pct >= 100) ta.classList.add('danger');
+      else if (pct >= 80) ta.classList.add('warn');
+      updateHighlight(ta, hl, f.max);
+    });
+  });
+
+  function flashCopied(btn, orig) {
+    btn.textContent = '✓ הועתק!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+  }
+
+  function copyField(taId, btnId) {
+    const btn = document.getElementById(btnId);
+    const orig = btn.textContent;
+    navigator.clipboard.writeText(document.getElementById(taId).value).then(() =>
+      flashCopied(btn, orig));
+  }
+
+  function clearField(taId, cntId, barId, max) {
+    const ta = document.getElementById(taId);
+    ta.value = ''; ta.style.height = 'auto'; ta.classList.remove('warn','danger','has-overflow');
+    const hl = document.getElementById('hl-' + taId);
+    if (hl) hl.innerHTML = '';
+    document.getElementById(cntId).textContent = '0/' + max;
+    document.getElementById(cntId).style.color = '#4ecf8e';
+    document.getElementById(barId).style.width = '0%';
+    document.getElementById(barId).style.background = '#4ecf8e';
+  }
+
+  // expose globals needed by inline onclick
+  window.copyField = copyField;
+  window.clearField = clearField;
+
+});
+</script>
+
+
+</body></html>
