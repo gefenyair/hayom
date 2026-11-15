@@ -59,6 +59,14 @@ try{
  const page=await browser.newPage({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true,locale:'he-IL',timezoneId:tz});
  await page.goto('https://www.israelhayom.co.il/',{waitUntil:'domcontentloaded',timeout:90000});
  await page.waitForTimeout(6500);
+ const title=await page.title();
+ const bodyText=(await page.locator('body').innerText().catch(()=>'' )).slice(0,1500);
+ const blocked=/access denied|request rejected|forbidden|you don't have permission|you do not have permission|גישה נדחתה/i.test(title+' '+bodyText);
+ const siteContent=await page.locator('a[href*="/article/"], article').count();
+ if(blocked||siteContent===0){
+  throw Error('Homepage capture rejected: '+JSON.stringify({title,blocked,siteContent,bodyExcerpt:bodyText.slice(0,160)}));
+ }
+
  await page.evaluate(async()=>{const step=650;for(let y=0;y<document.documentElement.scrollHeight;y+=step){window.scrollTo(0,y);await new Promise(r=>setTimeout(r,100))}window.scrollTo(0,0)});
  await page.waitForTimeout(2500);
  const png=await page.screenshot({fullPage:true,type:'png',animations:'disabled',timeout:120000});
