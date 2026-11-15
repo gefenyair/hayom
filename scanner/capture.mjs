@@ -28,7 +28,7 @@ do {
   fields:'nextPageToken,files(id,name)',pageSize:1000,pageToken
  });
  for(const folder of result.data.files||[]){
-  if(/^\\d{4}-\\d{2}-\\d{2}$/.test(folder.name)&&folder.name<oldestDate){
+  if(/^\d{4}-\d{2}-\d{2}$/.test(folder.name)&&folder.name<oldestDate){
    await drive.files.delete({fileId:folder.id});
    console.log('Permanently deleted expired screenshot folder:',folder.name);
   }
@@ -36,7 +36,7 @@ do {
  pageToken=result.data.nextPageToken;
 }while(pageToken);
 manifest.captures=(manifest.captures||[]).filter(x=>x.date>=oldestDate&&x.date<=date);
-await writeFile(manifestPath,JSON.stringify(manifest,null,2)+'\\n');
+await writeFile(manifestPath,JSON.stringify(manifest,null,2)+'\n');
 const folderName=date;
 const q="'"+folderId.replace(/'/g,"\\'")+"' in parents and name = '"+folderName+"' and mimeType = 'application/vnd.google-apps.folder' and trashed = false";
 const existing=await drive.files.list({q,fields:'files(id,name)',pageSize:10});
