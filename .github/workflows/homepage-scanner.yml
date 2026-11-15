@@ -1,0 +1,41 @@
+name: Homepage scanner
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '5 * * * *'
+permissions:
+  contents: write
+concurrency:
+  group: homepage-scanner
+  cancel-in-progress: false
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        working-directory: scanner
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Capture and upload
+        working-directory: scanner
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          DRIVE_FOLDER_ID: 1gX67FxPQmA8NXrFD9HYkLemCLcE7dUF3
+        run: node capture.mjs
+      - name: Update archive index
+        run: |
+          if ! git diff --quiet -- scanner/manifest.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add scanner/manifest.json
+            git commit -m "Update homepage screenshot index"
+            git push
+          fi
