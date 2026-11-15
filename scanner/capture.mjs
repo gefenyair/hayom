@@ -8,9 +8,11 @@ const hour=Number(parts.hour);
 if(hour!==0&&(hour<6||hour>23)){console.log('Outside scan hours');process.exit(0)}
 const date=[parts.year,parts.month,parts.day].join('-');
 const slot=String(hour).padStart(2,'0')+':00';
-const folderId=process.env.DRIVE_FOLDER_ID;
+// drive.file can access only files/folders created or explicitly opened by this OAuth app.
+// Create a dedicated app-owned folder in My Drive instead of using a pre-existing folder.
+
 const clientId=process.env.GOOGLE_CLIENT_ID,clientSecret=process.env.GOOGLE_CLIENT_SECRET,refreshToken=process.env.GOOGLE_REFRESH_TOKEN;
-if(!folderId||!clientId||!clientSecret||!refreshToken)throw Error('Missing Drive OAuth configuration');
+if(!clientId||!clientSecret||!refreshToken)throw Error('Missing Drive OAuth configuration');
 const oauth=new google.auth.OAuth2(clientId,clientSecret);
 oauth.setCredentials({refresh_token:refreshToken});
 const drive=google.drive({version:'v3',auth:oauth});
@@ -21,6 +23,15 @@ const todayUtc=Date.UTC(Number(parts.year),Number(parts.month)-1,Number(parts.da
 const oldestDate=new Date(todayUtc-(retentionDays-1)*86400000).toISOString().slice(0,10);
 const manifestPath=new URL('./manifest.json',import.meta.url);
 const manifest=JSON.parse(await readFile(manifestPath,'utf8'));
+const folderLabel='Hayom Homepage Scanner - Public Captures';
+let folderId=manifest.driveFolderId;
+if(folderId){try{await drive.files.get({fileId:folderId,fields:'id'});}catch(e){if(e.code===404)folderId=null;else throw e}}
+if(!folderId){
+ const created=await drive.files.create({requestBody:{name:folderLabel,mimeType:'application/vnd.google-apps.folder'},fields:'id'});
+ folderId=created.data.id;
+ manifest.driveFolderId=folderId;
+ console.log('Created dedicated scanner folder:',folderId);
+}
 let pageToken;
 do {
  const result=await drive.files.list({
@@ -59,6 +70,8 @@ const old=await drive.files.list({q:"'"+dayFolder+"' in parents and name = '"+fi
 let fileId=old.data.files?.[0]?.id;
 if(fileId){await drive.files.update({fileId,media:{mimeType:'image/webp',body:(await import('node:stream')).Readable.from(screenshot)}})}
 else {const created=await drive.files.create({requestBody:{name:filename,parents:[dayFolder]},media:{mimeType:'image/webp',body:(await import('node:stream')).Readable.from(screenshot)},fields:'id'});fileId=created.data.id}
+// Only screenshot files are publicly readable; other Drive content stays private.
+await drive.permissions.create({fileId,requestBody:{type:'anyone',role:'reader'},fields:'id'}).catch(e=>{if(e.code!==409)throw e});
 manifest.captures=manifest.captures.filter(x=>!(x.date===date&&x.hour===slot));
 manifest.captures.push({date,hour:slot,fileId});
 manifest.captures.sort((a,b)=>(a.date+' '+a.hour).localeCompare(b.date+' '+b.hour));
